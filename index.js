@@ -12,11 +12,15 @@ const mappedOptions = {
 function usgf(options, callback) {
   const args = ['ls-files', '--exclude-standard'];
 
-  for (let option in options) {
+  if (!Array.isArray(options)) {
+    callback(new Error('First parameter should be an array'));
+  }
+
+  options.forEach(option => {
     if (mappedOptions.hasOwnProperty(option) && mappedOptions[option].length) {
       args.push(mappedOptions[option]);
     }
-  }
+  });
 
   let stdoutResult = [];
   let stderrResult = '';
@@ -26,12 +30,10 @@ function usgf(options, callback) {
 
   command.stdout.on('data', (data) => {
     stdoutResult += data.toString();
-    // console.log(`stdout: ${data}`);
   });
 
   command.stderr.on('data', (data) => {
     stderrResult += data.toString();
-    // console.log(`stderr: ${data}`);
   });
 
   command.on('close', (code) => {
